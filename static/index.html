@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustMeBro — Fake News Analyzer</title>
+    <meta name="description" content="Multi-model AI-powered fake news detection with Gemini credibility scoring.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg>
+                </div>
+                <h1>TrustMeBro</h1>
+            </div>
+            <nav class="nav-links">
+                <a href="#analyzer" class="nav-link active" data-section="analyzer">Analyzer</a>
+                <a href="#dashboard" class="nav-link" data-section="dashboard">Dashboard</a>
+                <a href="#history" class="nav-link" data-section="history">History</a>
+                <a href="#admin" class="nav-link" data-section="admin">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- ==================== ANALYZER ==================== -->
+        <section id="analyzer" class="section section-active">
+            <div class="section-header">
+                <span class="section-badge">Multi-Model Analysis</span>
+                <h2>News Credibility Analyzer</h2>
+                <p>Paste a URL or article text. Three ML models + Gemini AI will score it simultaneously.</p>
+            </div>
+
+            <div class="analyzer-layout">
+                <!-- Input Column -->
+                <div class="card card-input">
+                    <div class="card-header">
+                        <h3>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                            Article Input
+                        </h3>
+                    </div>
+
+                    <div class="url-input-group">
+                        <input type="url" id="url-input" placeholder="Paste a news article URL...">
+                        <button class="btn-fetch" id="fetch-btn" onclick="fetchUrl()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
+                            </svg>
+                            Fetch
+                        </button>
+                    </div>
+                    <div class="url-divider">or paste text</div>
+
+                    <textarea id="article-text"
+                        placeholder="Paste your news article text here for multi-model credibility analysis..."
+                        rows="8"></textarea>
+                    <div class="char-count"><span id="char-count">0</span> characters</div>
+
+                    <button id="analyze-btn" class="btn-analyze" onclick="analyzeText()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <span>Analyze with All Models</span>
+                    </button>
+
+                    <!-- Feedback Section -->
+                    <div class="feedback-section hidden" id="feedback-section">
+                        <button class="btn-feedback-toggle" id="btn-feedback-toggle" onclick="toggleFeedback()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Give Feedback
+                        </button>
+
+                        <div class="feedback-form hidden" id="feedback-form">
+                            <div class="feedback-card">
+                                <p class="feedback-title">Was this analysis correct?</p>
+                                <div class="feedback-label-buttons">
+                                    <button class="btn-true" id="btn-fb-true" onclick="setFeedbackLabel('True')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                            <polyline points="22 4 12 14.01 9 11.01" />
+                                        </svg>
+                                        Article is True
+                                    </button>
+                                    <button class="btn-fake" id="btn-fb-fake" onclick="setFeedbackLabel('Fake')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <line x1="15" y1="9" x2="9" y2="15" />
+                                            <line x1="9" y1="9" x2="15" y2="15" />
+                                        </svg>
+                                        Article is Fake
+                                    </button>
+                                </div>
+                                <div class="feedback-description-group">
+                                    <label for="feedback-description">Describe why you think this is correct or
+                                        incorrect</label>
+                                    <textarea id="feedback-description" class="feedback-textarea"
+                                        placeholder="Your reasoning..." rows="3"></textarea>
+                                </div>
+                                <button class="btn-submit-feedback" id="btn-submit-feedback" onclick="submitFeedback()">
+                                    Submit
+                                </button>
+                                <div id="feedback-success-msg" class="feedback-success hidden">✅ Feedback submitted!
+                                    Thank you.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Column -->
+                <div class="results-column" id="results-column">
+                    <!-- Placeholder-->
+                    <div class="result-placeholder" id="result-placeholder">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        <p>Results will appear here after analysis</p>
+                        <span>4 ML models + Gemini AI + ChatGPT run in parallel</span>
+                    </div>
+
+                    <!-- Loading -->
+                    <div class="result-loading hidden" id="result-loading">
+                        <div class="spinner"></div>
+                        <p>Processing article...</p>
+                        <span class="loading-sub">Running parallel models + Gemini + ChatGPT reasoning</span>
+                    </div>
+
+                    <!-- Score Cards Grid -->
+                    <div class="score-cards hidden" id="score-cards">
+                        <div class="score-card" id="card-lr">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    Logistic Regression
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>Analyzes word frequency</strong> patterns
+                                                and assigns weights to terms commonly found in fake vs. real news.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Fast, interpretable,
+                                                and reliable on well-structured text.</div>
+                                            <div class="tooltip-caveat">May miss context — treats words independently.
+                                            </div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-lr">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-lr" />
+                                </svg>
+                                <div class="score-ring-value" id="value-lr">0%</div>
+                            </div>
+                        </div>
+                        <div class="score-card" id="card-svm">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    SVM
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>Support Vector Machine</strong> finds
+                                                optimal boundaries between fake and real news in a high-dimensional
+                                                feature space.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Excellent at separating
+                                                overlapping patterns with margin maximization.</div>
+                                            <div class="tooltip-caveat">Less effective with very short or ambiguous
+                                                text.</div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-svm">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-svm" />
+                                </svg>
+                                <div class="score-ring-value" id="value-svm">0%</div>
+                            </div>
+                        </div>
+                        <div class="score-card" id="card-nb">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    Naive Bayes
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>Probabilistic classifier</strong> that
+                                                uses Bayes' theorem — calculates the likelihood of fake/real based on
+                                                word distributions from training data.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Very fast and performs
+                                                well even with limited data.</div>
+                                            <div class="tooltip-caveat">Assumes word independence — may miss
+                                                phrase-level cues.</div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-nb">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-nb" />
+                                </svg>
+                                <div class="score-ring-value" id="value-nb">0%</div>
+                            </div>
+                        </div>
+                        <div class="score-card" id="card-lgbm">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    LightGBM
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>Gradient-boosted decision trees</strong>
+                                                that learn complex, non-linear patterns by iteratively correcting errors
+                                                from previous trees.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Captures subtle feature
+                                                interactions other models miss.</div>
+                                            <div class="tooltip-caveat">Can overfit on small or unbalanced datasets.
+                                            </div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-lgbm">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-lgbm" />
+                                </svg>
+                                <div class="score-ring-value" id="value-lgbm">0%</div>
+                            </div>
+                        </div>
+                        <div class="score-card score-card-gemini" id="card-gemini">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    Gemini AI
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>Large Language Model</strong> that reads
+                                                the full article and evaluates context, tone, logical consistency, and
+                                                source credibility signals.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Understands nuance,
+                                                sarcasm, and contextual clues beyond word frequency.</div>
+                                            <div class="tooltip-caveat">Subject to API rate limits; may be unavailable
+                                                during high traffic.</div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-gemini">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-gemini" />
+                                </svg>
+                                <div class="score-ring-value" id="value-gemini">0%</div>
+                            </div>
+                            <div class="gemini-reasoning hidden" id="gemini-reasoning"></div>
+                        </div>
+                        <div class="score-card score-card-chatgpt" id="card-chatgpt">
+                            <div class="score-card-header">
+                                <span class="score-model-name">
+                                    ChatGPT
+                                    <span class="tooltip-wrapper">
+                                        <span class="info-icon">i</span>
+                                        <div class="tooltip-content">
+                                            <div class="tooltip-title">How it works</div>
+                                            <div class="tooltip-text"><strong>GPT-4o-mini</strong> analyzes the
+                                                article's claims, writing style, source attribution, and logical
+                                                coherence to assess credibility.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Excellent contextual
+                                                reasoning and cross-referencing of factual claims.</div>
+                                            <div class="tooltip-caveat">Knowledge cutoff may miss very recent events.
+                                            </div>
+                                        </div>
+                                    </span>
+                                </span>
+                                <span class="score-badge" id="badge-chatgpt">—</span>
+                            </div>
+                            <div class="score-ring-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bg" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-chatgpt" />
+                                </svg>
+                                <div class="score-ring-value" id="value-chatgpt">0%</div>
+                            </div>
+                            <div class="chatgpt-reasoning hidden" id="chatgpt-reasoning"></div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Score -->
+                    <div class="overall-score hidden" id="overall-score">
+                        <div class="overall-header">
+                            <h3>Overall Credibility Score</h3>
+                            <span class="overall-label" id="overall-label">—</span>
+                        </div>
+                        <div class="overall-bar-container">
+                            <div class="overall-bar-track">
+                                <div class="overall-bar-fill" id="overall-bar-fill"></div>
+                            </div>
+                            <div class="overall-value" id="overall-value">0 / 100</div>
+                        </div>
+                        <p class="overall-formula">Score = (ML Avg × 0.5) + (Gemini × 0.25) + (ChatGPT × 0.25)</p>
+                    </div>
+
+                    <!-- Error -->
+                    <div class="result-error hidden" id="result-error">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        <p id="error-message">Something went wrong</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== HEADLINES ==================== -->
+        <section id="headlines-section" class="headlines-section">
+            <div class="headlines-header">
+                <div class="headlines-title-row">
+                    <div>
+                        <span class="section-badge">Live Feed</span>
+                        <h2 class="headlines-title">Current Headlines</h2>
+                        <p class="headlines-subtitle">Click any headline to analyze its credibility</p>
+                    </div>
+                    <button class="btn-refresh-headlines" id="btn-refresh-headlines" onclick="loadHeadlines()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="23 4 23 10 17 10" />
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+                <div class="headlines-categories" id="headlines-categories">
+                    <button class="cat-btn active" data-cat="general">🌍 Top Stories</button>
+                    <button class="cat-btn" data-cat="technology">💻 Tech</button>
+                    <button class="cat-btn" data-cat="business">📈 Business</button>
+                    <button class="cat-btn" data-cat="science">🔬 Science</button>
+                    <button class="cat-btn" data-cat="health">🏥 Health</button>
+                    <button class="cat-btn" data-cat="sports">⚽ Sports</button>
+                    <button class="cat-btn" data-cat="entertainment">🎬 Entertainment</button>
+                </div>
+            </div>
+            <div class="headlines-grid" id="headlines-grid">
+                <div class="headlines-loading" id="headlines-loading">
+                    <div class="spinner"></div>
+                    <p>Loading headlines...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== DASHBOARD ==================== -->
+        <section id="dashboard" class="section">
+            <div class="section-header">
+                <span class="section-badge">Insights</span>
+                <h2>Model Performance</h2>
+                <p>Real-world accuracy and F1-scores for our trained detection models.</p>
+            </div>
+
+
+
+            <div class="dashboard-grid">
+                <div class="stats-row" id="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-models"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="15" rx="2" />
+                                <polyline points="17 2 12 7 7 2" />
+                            </svg></div>
+                        <div class="stat-info"><span class="stat-value" id="stat-model-count">—</span><span
+                                class="stat-label">Models</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-accuracy"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg></div>
+                        <div class="stat-info"><span class="stat-value" id="stat-best-acc">—</span><span
+                                class="stat-label">Best Accuracy</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-f1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg></div>
+                        <div class="stat-info"><span class="stat-value" id="stat-best-f1">—</span><span
+                                class="stat-label">Best F1</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-best"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg></div>
+                        <div class="stat-info"><span class="stat-value" id="stat-best-model">—</span><span
+                                class="stat-label">Best Model</span></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="9" y1="21" x2="9" y2="9" />
+                            </svg> Model Comparison</h3>
+                        <button class="btn-refresh" onclick="loadDashboard()"><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                            </svg> Refresh</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Accuracy</th>
+                                    <th>Precision</th>
+                                    <th>Recall</th>
+                                    <th>F1</th>
+                                    <th>ROC-AUC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-tbody">
+                                <tr>
+                                    <td colspan="6" class="table-empty">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            </svg> Available Models</h3>
+                    </div>
+                    <div class="model-chips" id="model-chips"><span class="chip-loading">Loading...</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== HISTORY ==================== -->
+        <section id="history" class="section">
+            <div class="section-header">
+                <span class="section-badge">Analysis Log</span>
+                <h2>Analysis History</h2>
+                <p>Review past credibility checks and their multi-model results.</p>
+            </div>
+            <div class="history-controls">
+                <span class="history-count" id="history-count">0 analyses</span>
+                <button class="btn-clear" onclick="clearHistory()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Clear All
+                </button>
+            </div>
+            <div class="history-list" id="history-list">
+                <div class="history-empty" id="history-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <p>No analyses yet. Start by analyzing an article!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ADMIN DASHBOARD ==================== -->
+        <section id="admin" class="section">
+            <div class="section-header">
+                <span class="section-badge">Admin Panel</span>
+                <h2>User Feedback Corrections</h2>
+                <p>Review user-submitted corrections for model retraining.</p>
+            </div>
+            <div class="admin-controls">
+                <span class="feedback-count" id="feedback-count">0 corrections</span>
+                <div class="admin-btns">
+                    <button class="btn-export" onclick="exportFeedbackCSV()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Export CSV
+                    </button>
+                    <button class="btn-clear" onclick="clearFeedback()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Article</th>
+                                <th>LR</th>
+                                <th>SVM</th>
+                                <th>NB</th>
+                                <th>LGBM</th>
+                                <th>Gemini</th>
+                                <th>GPT</th>
+                                <th>User Label</th>
+                                <th>Feedback</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <tr>
+                                <td colspan="10" class="table-empty">No feedback yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>TrustMeBro &middot; Multi-model fake news detection with Gemini AI</p>
+        </div>
+    </footer>
+
+    <script src="/static/script.js?v=3"></script>
+</body>
+
+</html>
