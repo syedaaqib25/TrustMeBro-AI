@@ -38,16 +38,25 @@ logger = logging.getLogger(__name__)
 
 def _ensure_nltk():
     """Download required NLTK data if missing and force load it."""
-    for resource in ["stopwords", "wordnet", "omw-1.4", "punkt"]:
-        try:
-            # Check for both corpora and tokenizers
-            if resource == "punkt":
-                nltk.data.find("tokenizers/punkt")
-            else:
-                nltk.data.find(f"corpora/{resource}")
-        except LookupError:
-            nltk.download(resource, quiet=True)
-    
+    import socket
+    original_timeout = socket.getdefaulttimeout()
+    try:
+        socket.setdefaulttimeout(10)  # 10s timeout to prevent hanging
+        for resource in ["stopwords", "wordnet", "omw-1.4", "punkt"]:
+            try:
+                # Check for both corpora and tokenizers
+                if resource == "punkt":
+                    nltk.data.find("tokenizers/punkt")
+                else:
+                    nltk.data.find(f"corpora/{resource}")
+            except LookupError:
+                logger.info("Downloading NLTK resource: %s", resource)
+                nltk.download(resource, quiet=True)
+    except Exception as e:
+        logger.warning("NLTK download issue (non-fatal): %s", e)
+    finally:
+        socket.setdefaulttimeout(original_timeout)
+
     # FORCE LOAD to prevent threading race conditions with LazyLoader
     try:
         from nltk.corpus import stopwords

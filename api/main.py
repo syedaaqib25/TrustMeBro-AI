@@ -43,7 +43,7 @@ HISTORY_FILE = os.path.join(DATA_DIR, "history.json")
 FEEDBACK_FILE = os.path.join(DATA_DIR, "feedback.json")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-CHATGPT_API_KEY = os.getenv("CHATGPT_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 # Rate limiting — relaxed to match actual free-tier quotas
 # Gemini free tier: 15 RPM, 1500 RPD
@@ -51,10 +51,10 @@ GEMINI_MAX_PER_MINUTE = 14
 GEMINI_MAX_PER_DAY = 1400
 _gemini_calls: list[float] = []
 
-# ChatGPT: generous limits for paid tier
-CHATGPT_MAX_PER_MINUTE = 20
-CHATGPT_MAX_PER_DAY = 500
-_chatgpt_calls: list[float] = []
+# Groq (Fast Inference): generous limits
+GROQ_MAX_PER_MINUTE = 30
+GROQ_MAX_PER_DAY = 14400
+_groq_calls: list[float] = []
 
 import time as _time
 
@@ -62,7 +62,7 @@ def _is_key_valid(key: str) -> bool:
     """Check if an API key looks real (not empty or placeholder)."""
     if not key or not key.strip():
         return False
-    placeholders = {"your_gemini_api_key_here", "your_openai_api_key_here", ""}
+    placeholders = {"your_gemini_api_key_here", "your_groq_api_key_here", "your-groq-key-here", ""}
     return key.strip() not in placeholders
 
 def _gemini_rate_ok() -> bool:
@@ -92,7 +92,10 @@ app = FastAPI(
 
 # Initialize NLTK on startup to prevent threading race conditions
 from data_pipeline import _ensure_nltk
-_ensure_nltk()
+try:
+    _ensure_nltk()
+except Exception as _nltk_err:
+    logger.warning("NLTK initialization failed (non-fatal): %s", _nltk_err)
 
 app.add_middleware(
     CORSMiddleware,
@@ -125,7 +128,7 @@ class GeminiScore(BaseModel):
     reasoning: str = ""
     error: Optional[str] = None
 
-class ChatGPTScore(BaseModel):
+class GroqScore(BaseModel):
     score: Optional[float] = None  # 0-100
     reasoning: str = ""
     error: Optional[str] = None
@@ -133,7 +136,7 @@ class ChatGPTScore(BaseModel):
 class AnalyzeResponse(BaseModel):
     models: list[ModelScore]
     gemini: GeminiScore
-    chatgpt: ChatGPTScore
+    groq: GroqScore
     overall_score: float  # 0-100
     overall_label: str
 
@@ -175,7 +178,7 @@ class FeedbackRequest(BaseModel):
     article_text: str
     model_scores: list[dict]
     gemini_score: Optional[float] = None
-    chatgpt_score: Optional[float] = None
+    groq_score: Optional[float] = None
     overall_score: float
     user_label: str = Field(..., description="'True' or 'Fake'")
     user_description: str = ""
@@ -192,16 +195,33 @@ class FeedbackListResponse(BaseModel):
 # ===================================================================
 
 def _parse_ai_json(response_text: str) -> dict:
-    """Extract JSON from AI response, handling markdown code blocks."""
+    """Extract JSON from AI response, handling markdown code blocks and extra text."""
+    import re
     cleaned = response_text.strip()
+    # Try direct parse first
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+    # Strip markdown code blocks
     if cleaned.startswith("```"):
         lines = cleaned.split("\n")
         cleaned = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
-    return json.loads(cleaned)
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            pass
+    # Regex fallback: find first {...} block
+    match = re.search(r'\{.*?\}', response_text, re.DOTALL)
+    if match:
+        return json.loads(match.group())
+    raise ValueError(f"No JSON found in AI response: {response_text[:200]}")
 
 
 async def _call_gemini(text: str) -> dict:
     """Call Gemini API for credibility scoring. Returns {score, reasoning, error}."""
+    import traceback
+
     # Skip if no valid API key
     if not _is_key_valid(GEMINI_API_KEY):
         return {"score": None, "reasoning": "", "error": "No Gemini API key configured. Add GEMINI_API_KEY to .env file."}
@@ -210,7 +230,7 @@ async def _call_gemini(text: str) -> dict:
     if not _gemini_rate_ok():
         return {"score": None, "reasoning": "", "error": "Gemini rate limit reached. Try again in a minute."}
 
-    from google import genai
+    from google import genai as genai_new
 
     prompt = f"""Rate this news article's credibility from 0 (fake) to 100 (verified).
 Return ONLY JSON: {{"score": <0-100>, "reasoning": "<one sentence>"}}
@@ -218,7 +238,7 @@ Return ONLY JSON: {{"score": <0-100>, "reasoning": "<one sentence>"}}
 Article:
 {text[:2000]}"""
 
-    max_retries = 2
+    max_retries = 3
     last_error = None
 
     for attempt in range(max_retries):
@@ -226,12 +246,12 @@ Article:
             _gemini_calls.append(_time.time())
             logger.info("Gemini API call (attempt %d/%d)", attempt + 1, max_retries)
 
-            client = genai.Client(api_key=GEMINI_API_KEY)
             loop = asyncio.get_running_loop()
 
             def _generate():
+                client = genai_new.Client(api_key=GEMINI_API_KEY)
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-2.5-flash",
                     contents=prompt,
                 )
                 return response.text
@@ -245,45 +265,50 @@ Article:
             return {"score": score, "reasoning": reasoning, "error": None}
 
         except Exception as e:
+            traceback.print_exc()
             last_error = str(e)
-            is_rate_error = ("429" in last_error or "quota" in last_error.lower()
-                            or "resource_exhausted" in last_error.lower())
-            if is_rate_error and attempt < max_retries - 1:
-                logger.info("Gemini rate limited, retrying in 2s...")
-                await asyncio.sleep(2)
+            is_retryable = ("429" in last_error or "503" in last_error
+                            or "quota" in last_error.lower()
+                            or "resource_exhausted" in last_error.lower()
+                            or "unavailable" in last_error.lower()
+                            or "overloaded" in last_error.lower())
+            if is_retryable and attempt < max_retries - 1:
+                wait_time = 2 ** (attempt + 1)  # 2s, 4s, 8s exponential backoff
+                logger.info("Gemini temporarily unavailable, retrying in %ds...", wait_time)
+                await asyncio.sleep(wait_time)
                 continue
             break
 
-    # All retries exhausted
-    if "429" in last_error or "quota" in last_error.lower() or "resource_exhausted" in last_error.lower():
-        last_error = "Gemini quota exceeded. Please wait a minute and try again."
-    logger.warning("Gemini API call failed: %s", last_error)
+    # Show a user-friendly error for 503/overload errors
+    logger.warning("Gemini API call failed (REAL ERROR): %s", last_error)
+    if last_error and ("503" in last_error or "unavailable" in last_error.lower()):
+        return {"score": None, "reasoning": "", "error": "Gemini is currently overloaded with high demand. Try again in a few minutes."}
     return {"score": None, "reasoning": "", "error": last_error}
 
 
 # ===================================================================
-# ChatGPT API
+# Groq API (Fast Inference)
 # ===================================================================
 
-def _chatgpt_rate_ok() -> bool:
-    """Check if we're within ChatGPT rate limits."""
+def _groq_rate_ok() -> bool:
+    """Check if we're within Groq rate limits."""
     now = _time.time()
-    _chatgpt_calls[:] = [t for t in _chatgpt_calls if now - t < 86400]
-    if len(_chatgpt_calls) >= CHATGPT_MAX_PER_DAY:
+    _groq_calls[:] = [t for t in _groq_calls if now - t < 86400]
+    if len(_groq_calls) >= GROQ_MAX_PER_DAY:
         return False
-    recent = [t for t in _chatgpt_calls if now - t < 60]
-    if len(recent) >= CHATGPT_MAX_PER_MINUTE:
+    recent = [t for t in _groq_calls if now - t < 60]
+    if len(recent) >= GROQ_MAX_PER_MINUTE:
         return False
     return True
 
-async def _call_chatgpt(text: str) -> dict:
-    """Call ChatGPT API for credibility scoring. Returns {score, reasoning, error}."""
+async def _call_groq(text: str) -> dict:
+    """Call Groq API for credibility scoring. Returns {score, reasoning, error}."""
     # Skip if no valid API key
-    if not _is_key_valid(CHATGPT_API_KEY):
-        return {"score": None, "reasoning": "", "error": "No ChatGPT API key configured. Add CHATGPT_API_KEY to .env file."}
+    if not _is_key_valid(GROQ_API_KEY):
+        return {"score": None, "reasoning": "", "error": "No Groq API key configured. Add GROQ_API_KEY to .env file."}
 
-    if not _chatgpt_rate_ok():
-        return {"score": None, "reasoning": "", "error": "ChatGPT rate limit reached. Try again later."}
+    if not _groq_rate_ok():
+        return {"score": None, "reasoning": "", "error": "Groq rate limit reached. Try again later."}
 
     from openai import OpenAI
 
@@ -298,15 +323,16 @@ Article:
 
     for attempt in range(max_retries):
         try:
-            _chatgpt_calls.append(_time.time())
-            logger.info("ChatGPT API call (attempt %d/%d)", attempt + 1, max_retries)
+            _groq_calls.append(_time.time())
+            logger.info("Groq API call (attempt %d/%d)", attempt + 1, max_retries)
 
-            client = OpenAI(api_key=CHATGPT_API_KEY, timeout=30)
+            # Groq is OpenAI-compatible
+            client = OpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1", timeout=30)
             loop = asyncio.get_running_loop()
 
             def _generate():
                 response = client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model="llama-3.3-70b-versatile",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.3,
                     max_tokens=150,
@@ -318,27 +344,22 @@ Article:
             score = max(0, min(100, float(result.get("score", 50))))
             reasoning = str(result.get("reasoning", ""))
 
-            logger.info("ChatGPT API SUCCESS: score=%s", score)
+            logger.info("Groq API SUCCESS: score=%s", score)
             return {"score": score, "reasoning": reasoning, "error": None}
 
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             last_error = str(e)
-            is_rate_error = ("429" in last_error or "rate_limit" in last_error.lower()
-                            or "insufficient_quota" in last_error.lower())
+            is_rate_error = ("429" in last_error or "rate_limit" in last_error.lower())
             if is_rate_error and attempt < max_retries - 1:
-                logger.info("ChatGPT rate limited, retrying in 2s...")
+                logger.info("Groq rate limited, retrying in 2s...")
                 await asyncio.sleep(2)
                 continue
             break
 
-    # All retries exhausted — friendly error messages
-    if "insufficient_quota" in last_error.lower() or "billing" in last_error.lower():
-        last_error = "OpenAI quota exceeded. Please add credits at platform.openai.com/settings/organization/billing"
-    elif "429" in last_error or "rate_limit" in last_error.lower():
-        last_error = "ChatGPT rate limit hit. Please wait a moment and retry."
-    elif "auth" in last_error.lower() or "api_key" in last_error.lower() or "invalid" in last_error.lower():
-        last_error = "ChatGPT API key is invalid. Please update the key."
-    logger.warning("ChatGPT API call failed: %s", last_error)
+    # Show the REAL error — don't mask it
+    logger.warning("Groq API call failed (REAL ERROR): %s", last_error)
     return {"score": None, "reasoning": "", "error": last_error}
 
 
@@ -352,13 +373,13 @@ def _run_model(text: str, model_name: str) -> dict:
         result = predict_text(text, model_name=model_name)
         # Convert to credibility score (0–100)
         # probability_true maps to credibility
-        credibility = round(result["probability_true"] * 100, 1)
+        credibility = round(result.get("probability_true", 0.0) * 100, 1)
         return {
             "model_name": model_name,
-            "label": result["label"],
-            "confidence": result["confidence"],
-            "probability_fake": result["probability_fake"],
-            "probability_true": result["probability_true"],
+            "label": result.get("label", "Unknown"),
+            "confidence": result.get("confidence", 0.0),
+            "probability_fake": result.get("probability_fake", 0.0),
+            "probability_true": result.get("probability_true", 0.0),
             "credibility_score": credibility,
         }
     except Exception as e:
@@ -434,29 +455,30 @@ async def analyze(req: AnalyzeRequest):
         for m in models_to_run
     ]
     gemini_future = _call_gemini(req.text)
-    chatgpt_future = _call_chatgpt(req.text)
+    groq_future = _call_groq(req.text)
 
     # Gather all results simultaneously
     ml_results = await asyncio.gather(*ml_futures)
     gemini_result = await gemini_future
-    chatgpt_result = await chatgpt_future
+    groq_result = await groq_future
 
     # Calculate weighted overall score
     valid_ml = [r for r in ml_results if r["label"] != "Error"]
     ml_avg = sum(r["credibility_score"] for r in valid_ml) / len(valid_ml) if valid_ml else 50.0
 
-    gemini_ok = gemini_result["score"] is not None
-    chatgpt_ok = chatgpt_result["score"] is not None
+    # Calculate weighted overall score safely (handle None scores)
+    score_sum = ml_avg * 0.5
+    weight_sum = 0.5
 
-    if gemini_ok and chatgpt_ok:
-        # Both AI models: ML 50%, Gemini 25%, ChatGPT 25%
-        overall = round((ml_avg * 0.50) + (gemini_result["score"] * 0.25) + (chatgpt_result["score"] * 0.25), 1)
-    elif gemini_ok:
-        overall = round((ml_avg * 0.6) + (gemini_result["score"] * 0.4), 1)
-    elif chatgpt_ok:
-        overall = round((ml_avg * 0.6) + (chatgpt_result["score"] * 0.4), 1)
-    else:
-        overall = round(ml_avg, 1)
+    if gemini_result.get("score") is not None:
+        score_sum += gemini_result["score"] * 0.25
+        weight_sum += 0.25
+
+    if groq_result.get("score") is not None:
+        score_sum += groq_result["score"] * 0.25
+        weight_sum += 0.25
+
+    overall = round(score_sum / weight_sum, 1)
 
     # Determine overall label
     if overall >= 70:
@@ -474,14 +496,14 @@ async def analyze(req: AnalyzeRequest):
         "overall_label": overall_label,
         "model_scores": {r["model_name"]: r["credibility_score"] for r in ml_results},
         "gemini_score": gemini_result["score"],
-        "chatgpt_score": chatgpt_result["score"],
+        "groq_score": groq_result["score"],
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }, max_items=MAX_HISTORY)
 
     return AnalyzeResponse(
         models=[ModelScore(**r) for r in ml_results],
         gemini=GeminiScore(**gemini_result),
-        chatgpt=ChatGPTScore(**chatgpt_result),
+        groq=GroqScore(**groq_result),
         overall_score=overall,
         overall_label=overall_label,
     )
@@ -548,7 +570,7 @@ async def submit_feedback(req: FeedbackRequest):
         "article_full": req.article_text,
         "model_scores": req.model_scores,
         "gemini_score": req.gemini_score,
-        "chatgpt_score": req.chatgpt_score,
+        "groq_score": req.groq_score,
         "overall_score": req.overall_score,
         "user_label": req.user_label,
         "user_description": req.user_description,
@@ -584,6 +606,23 @@ async def fetch_url(req: FetchUrlRequest):
     try:
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         response = requests.get(req.url, headers=headers, timeout=15)
+
+        # Handle specific HTTP errors with user-friendly messages
+        if response.status_code == 402:
+            raise HTTPException(
+                status_code=422,
+                detail="This article is behind a paywall and cannot be accessed. Please paste the article text directly instead."
+            )
+        if response.status_code == 403:
+            raise HTTPException(
+                status_code=422,
+                detail="Access to this article was denied (403 Forbidden). The site may be blocking automated requests. Please paste the article text directly."
+            )
+        if response.status_code == 401:
+            raise HTTPException(
+                status_code=422,
+                detail="This article requires authentication to access. Please paste the article text directly."
+            )
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -599,10 +638,16 @@ async def fetch_url(req: FetchUrlRequest):
         text = "\n\n".join(p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 30)
 
         if not text:
-            raise HTTPException(status_code=422, detail="Could not extract article text.")
+            raise HTTPException(status_code=422, detail="Could not extract article text from this page. The site may use JavaScript rendering. Please paste the article text directly.")
 
         return FetchUrlResponse(text=text, title=title)
 
+    except HTTPException:
+        raise  # Re-raise our custom HTTPExceptions
+    except requests.exceptions.Timeout:
+        raise HTTPException(status_code=422, detail="Request timed out. The site took too long to respond. Please try again or paste the article text directly.")
+    except requests.exceptions.ConnectionError:
+        raise HTTPException(status_code=422, detail="Could not connect to the website. Please check the URL and try again.")
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=422, detail=f"Failed to fetch URL: {str(e)}")
 
@@ -615,7 +660,7 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 _headlines_cache: dict = {"data": None, "timestamp": 0}
 HEADLINES_CACHE_SECONDS = 600  # 10 minutes
 
-@app.get("/headlines")
+@app.get("/newsfeed")
 async def get_headlines(category: str = "general", country: str = "us"):
     """Fetch top headlines from NewsAPI with in-memory caching."""
     if not _is_key_valid(NEWS_API_KEY):
@@ -639,7 +684,7 @@ async def get_headlines(category: str = "general", country: str = "us"):
             "pageSize": 12,
             "apiKey": NEWS_API_KEY,
         }
-        resp = req_lib.get(url, params=params, timeout=10)
+        resp = req_lib.get(url, params=params, timeout=20)
         resp.raise_for_status()
         raw = resp.json()
 
@@ -660,13 +705,26 @@ async def get_headlines(category: str = "general", country: str = "us"):
         return result
 
     except Exception as e:
-        logger.warning("NewsAPI call failed: %s", e)
-        raise HTTPException(status_code=502, detail=f"Failed to fetch headlines: {str(e)}")
+        logger.warning("NewsAPI (newsfeed) call failed: %s", e)
+        # Return empty list instead of 502 to avoid UI disruption
+        return {"articles": [], "totalResults": 0}
 
 
 # ===================================================================
 # Root
 # ===================================================================
+
+@app.get("/debug-ai")
+async def debug_ai():
+    """Diagnostic endpoint to verify AI key loading."""
+    return {
+        "gemini_key_loaded": bool(GEMINI_API_KEY) and len(GEMINI_API_KEY) > 10,
+        "gemini_key_prefix": GEMINI_API_KEY[:10] + "..." if GEMINI_API_KEY else "EMPTY",
+        "groq_key_loaded": bool(GROQ_API_KEY) and len(GROQ_API_KEY) > 10,
+        "groq_key_prefix": GROQ_API_KEY[:10] + "..." if GROQ_API_KEY else "EMPTY",
+        "news_key_loaded": bool(NEWS_API_KEY),
+    }
+
 
 @app.get("/")
 async def root():

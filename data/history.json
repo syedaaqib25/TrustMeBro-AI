@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "text_snippet": "SPOILER ALERT: The following reveals major plot points fromHulu‘s series premiere ofThe Testaments.\n\nSurprise! If fans ofThe Handmaid’s Talewere worried they’d never see June Osbourne again, they need…",
+    "overall_score": 46.5,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 1.9,
+      "svm": 0.0,
+      "naive_bayes": 0.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-09T07:24:36.307641+00:00"
+  },
+  {
+    "text_snippet": "Asia-Pacific markets rallied on Wednesday after U.S. PresidentDonald Trumpsaid he had agreed to suspendplanned attacks on Iranian infrastructurefor two weeks.\n\nThe move was \"subject to the Islamic Rep…",
+    "overall_score": 56.2,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 85.7,
+      "svm": 93.5,
+      "naive_bayes": 99.9,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 5.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-09T06:15:43.538034+00:00"
+  },
+  {
+    "text_snippet": "U.S. AND IRAN AGREE TO 2-WEEK CEASEFIRE - Axios",
+    "overall_score": 36.9,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 34.3,
+      "svm": 1.0,
+      "naive_bayes": 80.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 10.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-09T06:14:00.501427+00:00"
+  },
+  {
+    "text_snippet": "U.S. AND IRAN AGREE TO 2-WEEK CEASEFIRE - Axios",
+    "overall_score": 45.9,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 34.3,
+      "svm": 1.0,
+      "naive_bayes": 80.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-09T06:12:08.588447+00:00"
+  },
+  {
+    "text_snippet": "Top contenders for the nastiest sting range from bullet ants to warrior wasps and tiny jellyfish. To find out which is most painful, some adventurous experts have spent their lives getting stung.\n\nWou…",
+    "overall_score": 30.8,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 4.8,
+      "svm": 0.1,
+      "naive_bayes": 0.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-08T13:48:40.474542+00:00"
+  },
+  {
+    "text_snippet": "Asian stocks traded mixed Monday, with several key markets closed for holidays, with investors monitoring developments in the Middle East conflict.\n\nPresidentDonald Trumpon Sunday issued a fresh round…",
+    "overall_score": 43.3,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 96.2,
+      "svm": 100.0,
+      "naive_bayes": 100.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 5.0,
+    "groq_score": 20.0,
+    "timestamp": "2026-04-07T07:58:15.424186+00:00"
+  },
+  {
+    "text_snippet": "So, this is the clearest way to explain what Michigan did to Arizona in a national semifinal billed as a battle between two heavyweights: Yaxel Lendeborg played the second half after spraining his MCL…",
+    "overall_score": 3.0,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 11.1,
+      "svm": 2.9,
+      "naive_bayes": 0.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 5.0,
+    "groq_score": 0,
+    "timestamp": "2026-04-06T09:46:31.181211+00:00"
+  },
+  {
+    "text_snippet": "Uri Alon was long puzzled by a textbook statistic:Longevity, the thinking went, was about 20 percent in ourgenes.\n\n“That makes you think what’s the rest of the 80 percent: Is it the lifestyle? Why sho…",
+    "overall_score": 54.4,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 36.5,
+      "svm": 24.0,
+      "naive_bayes": 4.7,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-06T09:45:40.848571+00:00"
+  },
+  {
+    "text_snippet": "Uri Alon was long puzzled by a textbook statistic:Longevity, the thinking went, was about 20 percent in ourgenes.\n\n“That makes you think what’s the rest of the 80 percent: Is it the lifestyle? Why sho…",
+    "overall_score": 54.4,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 36.5,
+      "svm": 24.0,
+      "naive_bayes": 4.7,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-06T09:44:14.846784+00:00"
+  },
+  {
+    "text_snippet": "The world is about to end according to a new report from Mars. This is definitely not fake news at all. Trust me bro.",
+    "overall_score": 0.9,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 6.0,
+      "svm": 0.0,
+      "naive_bayes": 1.2,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 0,
+    "groq_score": 0,
+    "timestamp": "2026-04-06T09:43:11.495063+00:00"
+  },
+  {
+    "text_snippet": "Uri Alon was long puzzled by a textbook statistic:Longevity, the thinking went, was about 20 percent in ourgenes.\n\n“That makes you think what’s the rest of the 80 percent: Is it the lifestyle? Why sho…",
+    "overall_score": 53.2,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 36.5,
+      "svm": 24.0,
+      "naive_bayes": 4.7,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 90.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-06T09:36:35.536744+00:00"
+  }
+]

@@ -42,7 +42,7 @@
             <div class="section-header">
                 <span class="section-badge">Multi-Model Analysis</span>
                 <h2>News Credibility Analyzer</h2>
-                <p>Paste a URL or article text. Three ML models + Gemini AI will score it simultaneously.</p>
+                <p>Paste a URL or article text. Four ML models + Gemini AI + Groq will score it simultaneously.</p>
             </div>
 
             <div class="analyzer-layout">
@@ -143,14 +143,14 @@
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                         </svg>
                         <p>Results will appear here after analysis</p>
-                        <span>4 ML models + Gemini AI + ChatGPT run in parallel</span>
+                        <span>4 ML models + Gemini AI + Groq run in parallel</span>
                     </div>
 
                     <!-- Loading -->
                     <div class="result-loading hidden" id="result-loading">
                         <div class="spinner"></div>
                         <p>Processing article...</p>
-                        <span class="loading-sub">Running parallel models + Gemini + ChatGPT reasoning</span>
+                        <span class="loading-sub">Running parallel models + Gemini + Groq reasoning</span>
                     </div>
 
                     <!-- Score Cards Grid -->
@@ -295,34 +295,33 @@
                             </div>
                             <div class="gemini-reasoning hidden" id="gemini-reasoning"></div>
                         </div>
-                        <div class="score-card score-card-chatgpt" id="card-chatgpt">
+                        <div class="score-card score-card-groq" id="card-groq">
                             <div class="score-card-header">
                                 <span class="score-model-name">
-                                    ChatGPT
+                                    Groq AI
                                     <span class="tooltip-wrapper">
                                         <span class="info-icon">i</span>
                                         <div class="tooltip-content">
                                             <div class="tooltip-title">How it works</div>
-                                            <div class="tooltip-text"><strong>GPT-4o-mini</strong> analyzes the
-                                                article's claims, writing style, source attribution, and logical
-                                                coherence to assess credibility.</div>
-                                            <div class="tooltip-text"><strong>Strength:</strong> Excellent contextual
-                                                reasoning and cross-referencing of factual claims.</div>
-                                            <div class="tooltip-caveat">Knowledge cutoff may miss very recent events.
-                                            </div>
+                                            <div class="tooltip-text"><strong>Groq (Llama 3)</strong> provides ultra-fast
+                                                inference to analyze article context, tone, and logical consistency.</div>
+                                            <div class="tooltip-text"><strong>Strength:</strong> Near-instant analysis
+                                                with high-reasoning capabilities.</div>
+                                            <div class="tooltip-caveat">Excellent for speed, but may occasionally miss
+                                                very recent live news updates.</div>
                                         </div>
                                     </span>
                                 </span>
-                                <span class="score-badge" id="badge-chatgpt">—</span>
+                                <span class="score-badge" id="badge-groq">—</span>
                             </div>
                             <div class="score-ring-container">
                                 <svg class="score-ring" viewBox="0 0 120 120">
                                     <circle cx="60" cy="60" r="52" class="score-ring-bg" />
-                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-chatgpt" />
+                                    <circle cx="60" cy="60" r="52" class="score-ring-fill" id="ring-groq" />
                                 </svg>
-                                <div class="score-ring-value" id="value-chatgpt">0%</div>
+                                <div class="score-ring-value" id="value-groq">0%</div>
                             </div>
-                            <div class="chatgpt-reasoning hidden" id="chatgpt-reasoning"></div>
+                            <div class="groq-reasoning hidden" id="groq-reasoning"></div>
                         </div>
                     </div>
 
@@ -338,7 +337,7 @@
                             </div>
                             <div class="overall-value" id="overall-value">0 / 100</div>
                         </div>
-                        <p class="overall-formula">Score = (ML Avg × 0.5) + (Gemini × 0.25) + (ChatGPT × 0.25)</p>
+                        <p class="overall-formula">Score = (ML Avg × 0.5) + (Gemini × 0.25) + (Groq × 0.25)</p>
                     </div>
 
                     <!-- Error -->
@@ -555,7 +554,7 @@
                                 <th>NB</th>
                                 <th>LGBM</th>
                                 <th>Gemini</th>
-                                <th>GPT</th>
+                                <th>Groq</th>
                                 <th>User Label</th>
                                 <th>Feedback</th>
                                 <th>Time</th>
@@ -574,11 +573,11 @@
 
     <footer class="footer">
         <div class="container">
-            <p>TrustMeBro &middot; Multi-model fake news detection with Gemini AI</p>
+            <p>TrustMeBro &middot; Multi-model fake news detection with Gemini and Groq AI</p>
         </div>
     </footer>
 
-    <script src="/static/script.js?v=3"></script>
+    <script src="/static/app.js"></script>
 </body>
 
 </html>

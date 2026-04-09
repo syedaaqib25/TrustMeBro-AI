@@ -106,7 +106,7 @@ class TestAnalyzeEndpoint:
         data = response.json()
         assert "models" in data
         assert "gemini" in data
-        assert "chatgpt" in data
+        assert "groq" in data
         assert "overall_score" in data
         assert "overall_label" in data
         assert len(data["models"]) > 0
