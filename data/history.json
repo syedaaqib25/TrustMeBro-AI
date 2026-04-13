@@ -1,5 +1,299 @@
 [
   {
+    "text_snippet": "AUGUSTA, Ga. – Rory McIlroy’s victory lap has turned into rush hour.\n\nWith the driest tournament week in some 15 years, it would allow Augusta National Golf Club to be set up as firm, fast and furious…",
+    "overall_score": 48.0,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 12.0,
+      "svm": 1.8,
+      "naive_bayes": 0.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T07:41:44.513153+00:00"
+  },
+  {
+    "text_snippet": "The dawn of a new ‌era at light heavyweight commenced in Miami in the ⁠main event of ⁠UFC 327, which saw Carlos Ulberg win the vacant Ultimate Fighting Championship light heavyweight title over former…",
+    "overall_score": 5.7,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 27.2,
+      "svm": 15.7,
+      "naive_bayes": 2.4,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 0,
+    "groq_score": 0,
+    "timestamp": "2026-04-13T07:41:25.959541+00:00"
+  },
+  {
+    "text_snippet": "The dawn of a new ‌era at light heavyweight commenced in Miami in the ⁠main event of ⁠UFC 327, which saw Carlos Ulberg win the vacant Ultimate Fighting Championship light heavyweight title over former…",
+    "overall_score": 5.7,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 27.2,
+      "svm": 15.7,
+      "naive_bayes": 2.4,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 0,
+    "groq_score": 0,
+    "timestamp": "2026-04-13T07:41:10.271901+00:00"
+  },
+  {
+    "text_snippet": "The dawn of a new ‌era at light heavyweight commenced in Miami in the ⁠main event of ⁠UFC 327, which saw Carlos Ulberg win the vacant Ultimate Fighting Championship light heavyweight title over former…",
+    "overall_score": 5.7,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 27.2,
+      "svm": 15.7,
+      "naive_bayes": 2.4,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 0,
+    "groq_score": 0,
+    "timestamp": "2026-04-13T07:40:30.775104+00:00"
+  },
+  {
+    "text_snippet": "Goaltender Hicks named Most Outstanding Player after making 78 saves in 2 games\n\nLAS VEGAS --For the second time in three seasons, the Denver Pioneers won theÂ NCAA National Championship, defeating th…",
+    "overall_score": 27.2,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 7.2,
+      "svm": 0.2,
+      "naive_bayes": 0.1,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 15.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T07:40:06.232132+00:00"
+  },
+  {
+    "text_snippet": "Two U.S. Navy destroyers had transited the Strait of Hormuz to begin mine-clearing operations in the vital waterway, U.S. Central Command said Saturday.\n\nThe destroyers crossed through the Strait and …",
+    "overall_score": 57.7,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 86.1,
+      "svm": 95.4,
+      "naive_bayes": 100.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 10.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-13T07:39:37.918058+00:00"
+  },
+  {
+    "text_snippet": "Goaltender Hicks named Most Outstanding Player after making 78 saves in 2 games\n\nLAS VEGAS --For the second time in three seasons, the Denver Pioneers won theÂ NCAA National Championship, defeating th…",
+    "overall_score": 27.2,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 7.2,
+      "svm": 0.2,
+      "naive_bayes": 0.1,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 15.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T07:38:20.159185+00:00"
+  },
+  {
+    "text_snippet": "A newly identified galaxy observed byNASA’s James Webb Space Telescopecould mark a turning point in understanding one of the most puzzling discoveries in modern astronomy: the so-calledlittle red dots…",
+    "overall_score": 34.5,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 12.3,
+      "svm": 0.1,
+      "naive_bayes": 4.6,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 95.0,
+    "timestamp": "2026-04-13T06:02:59.552919+00:00"
+  },
+  {
+    "text_snippet": "A star right here in the Milky Way galaxy is the purest ancient star astronomers have found to date.\n\nThat means that it's remarkably (although not entirely) unpolluted by the metals that only formed …",
+    "overall_score": 31.3,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 7.0,
+      "svm": 0.1,
+      "naive_bayes": 0.7,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T06:02:32.675329+00:00"
+  },
+  {
+    "text_snippet": "Artemis II’s moon-traveling astronauts are back home and feted to a thunderous welcome. Still marveling over their record-breaking lunar fly-around, the crew of four flew to Houston’s Ellington Field …",
+    "overall_score": 33.5,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 17.6,
+      "svm": 1.5,
+      "naive_bayes": 1.9,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T06:02:17.202711+00:00"
+  },
+  {
+    "text_snippet": "Artemis II’s moon-traveling astronauts are back home and feted to a thunderous welcome. Still marveling over their record-breaking lunar fly-around, the crew of four flew to Houston’s Ellington Field …",
+    "overall_score": 36.2,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 17.6,
+      "svm": 1.5,
+      "naive_bayes": 1.9,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 98.0,
+    "timestamp": "2026-04-13T06:01:57.691443+00:00"
+  },
+  {
+    "text_snippet": "PlaySide and Fumi Games haveshareddetails about the frame rate and resolution for Mouse: P.I. for Hire on Nintendo Switch 2.Mouse: P.I. for Hire is one of those titles that will have a Performance Mod…",
+    "overall_score": 23.8,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 15.1,
+      "svm": 1.0,
+      "naive_bayes": 3.9,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 5.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-13T06:01:33.907257+00:00"
+  },
+  {
+    "text_snippet": "Keeping your Android phone up-to-date should be a straight-forward task. You have updates for apps in theGoogle Play storeandsystem updatesthat show up at some point in most months. Those system updat…",
+    "overall_score": 31.0,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 4.2,
+      "svm": 0.0,
+      "naive_bayes": 1.6,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T06:01:07.338253+00:00"
+  },
+  {
+    "text_snippet": "For anyone wondering what the criteria to get a refund on Nintendo eShop is and how to actually get one, we’ve got you covered.Historically, Nintendo isn’t too keen on offering digital purchase refund…",
+    "overall_score": 27.7,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 5.0,
+      "svm": 0.1,
+      "naive_bayes": 1.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": null,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-13T06:00:34.453681+00:00"
+  },
+  {
+    "text_snippet": "WHO issues updated guidance on global measles outbreaks.",
+    "overall_score": 57.7,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 31.7,
+      "svm": 5.0,
+      "naive_bayes": 55.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T05:59:53.030355+00:00"
+  },
+  {
+    "text_snippet": "Scientists confirm drinking bleach cures all viruses overnight.",
+    "overall_score": 5.9,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 27.2,
+      "svm": 2.4,
+      "naive_bayes": 17.2,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 0,
+    "groq_score": 0,
+    "timestamp": "2026-04-13T05:59:23.107429+00:00"
+  },
+  {
+    "text_snippet": "Republicans fooled by AI-generated image of US airman rescued in Iran.\nReported by a mainstream publication with recent publication date.",
+    "overall_score": 47.9,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 14.9,
+      "svm": 0.1,
+      "naive_bayes": 17.7,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 85.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T05:58:10.585631+00:00"
+  },
+  {
+    "text_snippet": "Pope Francis endorses Donald Trump for president.\nThis was a widely shared fabricated story during the 2016 U.S. election and was false.",
+    "overall_score": 31.8,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 28.5,
+      "svm": 2.1,
+      "naive_bayes": 33.5,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 0,
+    "timestamp": "2026-04-13T05:57:32.391370+00:00"
+  },
+  {
+    "text_snippet": "In addition toredesigning the homepageof the PS5, it looks like Sony is also plotting some sweeping changes to thePS Store.\n\nAn imagecirculating on social mediafrom the system’s beta program shows a n…",
+    "overall_score": 34.1,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 2.5,
+      "svm": 0.0,
+      "naive_bayes": 0.5,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 55.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-13T05:55:48.036546+00:00"
+  },
+  {
+    "text_snippet": "It has been more than two decades since 34-year-old Kim Langwell disappeared and former Beaumont, Texas, Detective Joe Ball still relives those early days of the investigation over and over again.\n\nDe…",
+    "overall_score": 46.4,
+    "overall_label": "Uncertain",
+    "model_scores": {
+      "logistic_regression": 1.1,
+      "svm": 0.0,
+      "naive_bayes": 0.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 95.0,
+    "groq_score": 90.0,
+    "timestamp": "2026-04-13T05:53:56.880313+00:00"
+  },
+  {
+    "text_snippet": "For anyone wondering what the criteria to get a refund on Nintendo eShop is and how to actually get one, we’ve got you covered.Historically, Nintendo isn’t too keen on offering digital purchase refund…",
+    "overall_score": 25.8,
+    "overall_label": "Likely Fake",
+    "model_scores": {
+      "logistic_regression": 5.0,
+      "svm": 0.1,
+      "naive_bayes": 1.0,
+      "lightgbm": 0.2
+    },
+    "gemini_score": 20.0,
+    "groq_score": 80.0,
+    "timestamp": "2026-04-13T05:53:00.489169+00:00"
+  },
+  {
     "text_snippet": "SPOILER ALERT: The following reveals major plot points fromHulu‘s series premiere ofThe Testaments.\n\nSurprise! If fans ofThe Handmaid’s Talewere worried they’d never see June Osbourne again, they need…",
     "overall_score": 46.5,
     "overall_label": "Uncertain",
